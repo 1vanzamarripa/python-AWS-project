@@ -1,7 +1,5 @@
 - name: create cloudformation stack
   cloudformation:
-    aws_access_key: "AKIAIEN2CMARVEBTBZQQ"
-    aws_secret_key: "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"
     stack_name: "DevopsHomework"
     state: "present"
     region: "us-east-1"
@@ -16,8 +14,8 @@
 
 - name: remove cloudformation stack
   cloudformation:
-    aws_access_key: "AKIAIEN2CMARVEBTBZQQ"
-    aws_secret_key: "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"
+    aws_access_key: ""
+    aws_secret_key: ""
     stack_name: "DevopsHomework"
     state: "absent"
     region: "us-east-1"
