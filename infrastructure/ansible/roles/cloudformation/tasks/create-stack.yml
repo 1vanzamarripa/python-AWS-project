@@ -1,0 +1,26 @@
+- name: create cloudformation stack
+  cloudformation:
+    aws_access_key: "AKIAIEN2CMARVEBTBZQQ"
+    aws_secret_key: "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"
+    stack_name: "DevopsHomework"
+    state: "present"
+    region: "us-east-1"
+    disable_rollback: true
+    template: "roles/cloudformation/files/environment.yml"
+    template_parameters:
+      KeyName: "testKeyPair"
+      DatabasePassword: "Vfr45tgb$"
+    tags:
+      Stack: "rescale-homework"
+  when: create | bool
+
+- name: remove cloudformation stack
+  cloudformation:
+    aws_access_key: "AKIAIEN2CMARVEBTBZQQ"
+    aws_secret_key: "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"
+    stack_name: "DevopsHomework"
+    state: "absent"
+    region: "us-east-1"
+    tags:
+      Stack: "rescale-homework"
+  when: remove | bool

@@ -1,0 +1,15 @@
+---
+# Service
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: hardware
+  name: hardware
+  namespace: homework
+spec:
+  ports:
+    - port: 5001
+      targetPort: 5001
+  selector:
+    k8s-app: hardware

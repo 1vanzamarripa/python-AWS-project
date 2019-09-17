@@ -1,0 +1,62 @@
+pipeline {
+    agent {  
+        kubernetes {
+            label 'hardware-pod'
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: docker
+    image: docker:18.09
+    command: ['cat']
+    tty: true
+    env:
+    - name: DOCKER_HOST
+        value: tcp://localhost:2375
+"""
+        }
+    }
+
+    options {
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        DOCKER_REGISTRY_URL = "index.docker.io"
+        DOCKER_REGISTRY_LOGIN = credentials('docker-repo-credentials')
+        DOCKER_REPO = "somerepo"
+        K8S_DIR="k8s"
+        APP="hardware"
+    }
+    
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    container("docker"){
+                        sh "docker build -t ${env.DOCKER_REPO}/${APP}:${env.BUILD_NUMBER} ."
+                    }
+                }
+            }
+        }
+        stage('Push to registry') {
+            steps {
+                script {
+                    sh "echo ${env.DOCKER_REGISTRY_LOGIN_PSW} | docker login -u ${env.DOCKER_REGISTRY_LOGIN_USR} --password-stdin ${env.DOCKER_REGISTRY_URL}"
+                    sh "docker push ${env.DOCKER_REPO}/${APP}:${env.BUILD_NUMBER} "
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sh "sed -i 's|<DOCKER_REPO>|${DOCKER_REPO}|g' k8s/${APP}-deployment.yml"
+                    sh "kubectl apply -f ${K8S_DIR}/${APP}-secret.yml"
+                    sh "kubectl apply -f ${K8S_DIR}/${APP}-deployment.yml"
+                    sh "kubectl apply -f ${K8S_DIR}/${APP}-service.yml"
+                }
+            }
+        }
+    }
+}

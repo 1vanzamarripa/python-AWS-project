@@ -1,0 +1,10 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - include_role:
+        name: cloudformation
+        tasks_from: create-stack
+      tags: ansible-cloudformation

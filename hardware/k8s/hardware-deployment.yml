@@ -1,0 +1,43 @@
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: hardware
+  name: hardware
+  namespace: homework
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: hardware
+  template:
+    metadata:
+      labels:
+        k8s-app: hardware
+    spec:
+      containers:
+      - name: hardware
+        image: <DOCKER_REPO>/hardware:latest
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: hardware
+              key: dbpass
+        ports:
+        - containerPort: 5001
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            scheme: HTTPS
+            path: /hardware
+            port: 5001
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+      serviceAccountName: kubernetes-dashboard
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule

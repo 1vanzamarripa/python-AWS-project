@@ -1,0 +1,15 @@
+---
+# Service
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: portal
+  name: portal
+  namespace: homework
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    k8s-app: portal
