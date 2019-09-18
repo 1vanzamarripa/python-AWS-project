@@ -1,5 +1,5 @@
 Description:
-  This template sets up a public/private subnet, a ssh jumpbox, and a RDS database
+  This template sets up a public/private subnet, a ssh jumpbox, a RDS database and an EKS cluster
 
 Metadata:
   AWS::CloudFormation::Interface:

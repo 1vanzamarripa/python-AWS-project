@@ -8,7 +8,7 @@ aws configure
 echo "Please enter your EC2 Key Pair name"
 read KEY_PAIR_NAME
 echo "Please enter a Password for the RDS DB"
-read RDS_DB_PASS
+read -s RDS_DB_PASS
 TEMPLATE_PATH="ansible/roles/cloudformation/files"
 aws cloudformation deploy \
   --template-file ${TEMPLATE_PATH}/environment.yml \
@@ -22,7 +22,9 @@ rm -rf ../hardware/k8s/hardware-secret.yml
 git checkout -- ../hardware/k8s/hardware-secret.yml
 sed -i "s|<DB_PASSWORD>|$DB_PASSWORD|g" ../hardware/k8s/hardware-secret.yml
 DB_ENDPOINT=$(aws rds describe-db-instances \
-  --db-instance-identifier hardwareavailability --query 'DBInstances[*].[Endpoint]')
+  --db-instance-identifier hardwareavailability \
+  --query 'DBInstances[*].[Endpoint]' \
+  | grep "Address" | awk '{print $2}' | sed s/\"//g  | base64 -w 0)
 sed -i "s|<DB_ENDPOINT>|$DB_ENDPOINT|g" ../hardware/k8s/hardware-secret.yml
 
 ### EKS SETUP
