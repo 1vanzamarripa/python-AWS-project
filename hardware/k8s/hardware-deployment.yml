@@ -27,6 +27,11 @@ spec:
             secretKeyRef:
               name: hardware
               key: dbpass
+        - name: DB_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: hardware
+              key: dbendpoint
         ports:
         - containerPort: 5001
           protocol: TCP

@@ -288,6 +288,7 @@ Resources:
       DBInstanceClass: 'db.t3.micro'
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       DBName: 'hardwareavailability'
+      DBInstanceIdentifier: 'hardwareavailability'
       Engine: 'postgres'
       EngineVersion: '11.4'
       Port: 5432

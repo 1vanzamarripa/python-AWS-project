@@ -18,13 +18,21 @@ aws cloudformation deploy \
 
 ### RDS SETUP
 DB_PASSWORD=$(echo $RDS_DB_PASS | base64)
+rm -rf ../hardware/k8s/hardware-secret.yml
+git checkout -- ../hardware/k8s/hardware-secret.yml
 sed -i "s|<DB_PASSWORD>|$DB_PASSWORD|g" ../hardware/k8s/hardware-secret.yml
+DB_ENDPOINT=$(aws rds describe-db-instances \
+  --db-instance-identifier hardwareavailability --query 'DBInstances[*].[Endpoint]')
+sed -i "s|<DB_ENDPOINT>|$DB_ENDPOINT|g" ../hardware/k8s/hardware-secret.yml
 
 ### EKS SETUP
 #obtaining EKS cluster credentials and saving in ~/.kube/config
+rm -rf ~/.kube
 aws eks --region us-east-1 update-kubeconfig --name HomeworkCluster
 #making sure worker nodes can join the cluster
 #https://docs.aws.amazon.com/eks/latest/userguide/launch-workers.html
+rm -rf aws-auth-cm.yaml
+git checkout -- aws-auth-cm.yaml
 NODE_INSTANCE_ROLE=$(aws iam list-roles --query 'Roles[?contains(Arn, `NodeInstanceRole`) == `true`].[Arn]' | grep arn)
 sed -i "s|<NodeInstanceRoleArn>|$NODE_INSTANCE_ROLE|g" aws-auth-cm.yaml
 kubectl apply -f aws-auth-cm.yaml

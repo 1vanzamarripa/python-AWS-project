@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: portal
-        image: 1vanzamarripa/portal:latest
+        image: <DOCKER_REPO>/portal:latest
         ports:
         - containerPort: 5000
           protocol: TCP
