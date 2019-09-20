@@ -1,5 +1,5 @@
 CREATE TABLE hardware (
-  id integer primary key autoincrement,
+  id serial primary key,
   provider text not null,
   name text not null);
 

@@ -30,16 +30,9 @@ kubectl apply -f aws-auth-cm.yaml
 sleep 30 && kubectl apply -f namespace.yml
 
 ### RDS SETUP
-DB_PASSWORD=$(echo $RDS_DB_PASS | base64)
-DB_ENDPOINT=$(aws rds describe-db-instances \
-  --db-instance-identifier hardwareavailability \
-  --query 'DBInstances[*].[Endpoint]' \
-  | grep "Address" | awk '{print $2}' | sed s/\"//g  | base64 -w 0)
-rm -rf sql-job/k8s/db-secret.yml
-git checkout -- sql-job/k8s/db-secret.yml
-sed -i "s|<DB_PASSWORD>|$DB_PASSWORD|g" sql-job/k8s/db-secret.yml
-sed -i "s|<DB_ENDPOINT>|$DB_ENDPOINT|g" sql-job/k8s/db-secret.yml
-sql-job/build.sh 
+#This script will create a k8s job that will initialize the RDS DB with data
+cd sql-job && ./build.sh $RDS_DB_PASS 
+cd -
 
 ### ALB INGRESS CONTROLLER SETUP
 #create the policy
