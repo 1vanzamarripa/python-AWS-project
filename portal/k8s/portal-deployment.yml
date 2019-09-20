@@ -24,26 +24,3 @@ spec:
         ports:
         - containerPort: 5000
           protocol: TCP
-        volumeMounts:
-        - name: kubernetes-dashboard-certs
-          mountPath: /certs
-          # Create on-disk volume to store exec logs
-        - mountPath: /tmp
-          name: tmp-volume
-        livenessProbe:
-          httpGet:
-            scheme: HTTPS
-            path: /portal
-            port: 5001
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
-      volumes:
-      - name: kubernetes-dashboard-certs
-        secret:
-          secretName: kubernetes-dashboard-certs
-      - name: tmp-volume
-        emptyDir: {}
-      serviceAccountName: kubernetes-dashboard
-      tolerations:
-      - key: node-role.kubernetes.io/master
-        effect: NoSchedule

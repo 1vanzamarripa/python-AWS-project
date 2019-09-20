@@ -35,7 +35,3 @@ spec:
         ports:
         - containerPort: 5001
           protocol: TCP
-      serviceAccountName: kubernetes-dashboard
-      tolerations:
-      - key: node-role.kubernetes.io/master
-        effect: NoSchedule
