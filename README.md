@@ -66,3 +66,8 @@ In order to find out the ALB endpoint to hit, run this command:
 ```
 kubectl get svc -n homework 
 ```
+
+### EXTRA CREDIT:
+
+- The hardware.py script was modified to make use of multiprocessing, a pool of 5 threads was created in order to call the slow simulated function concurrently and reducing the amount of time it takes to get the data.
+- The Node group used to create the eks cluster is an auto scaling group.
