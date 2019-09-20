@@ -4,6 +4,7 @@ This project creates AWS infrastructure using a cloudformation script. This scri
 - generate a VPC with private and public subnets and their respective attachments and associations
 - an EKS cluster control plane in the public subnet and worker nodes in the private subnet
 - a RDS postgres database
+
 It also contains code and configuration for a couple of applications, named portal and hardware, as well as code to create and deploy a k8s job that populates the RDS database at stack creation time.
 
 ## Prerrequisites
@@ -66,6 +67,9 @@ In order to find out the ALB endpoint to hit, run this command:
 ```
 kubectl get svc -n homework 
 ```
+
+NOTE: There are Jenkinsfiles included that could be used as a starting point to set up CICD pipelines for the apps.
+
 
 ### EXTRA CREDIT:
 
