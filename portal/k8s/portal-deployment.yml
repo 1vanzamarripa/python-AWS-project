@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: portal
-        image: <DOCKER_REPO>/portal:latest
+        image: <DOCKER_REPO>/portal:<DOCKER_TAG>
         ports:
         - containerPort: 5000
           protocol: TCP

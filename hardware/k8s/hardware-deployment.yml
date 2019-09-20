@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: hardware
-        image: <DOCKER_REPO>/hardware:latest
+        image: <DOCKER_REPO>/hardware:<DOCKER_TAG>
         env:
         - name: DB_PASSWORD
           valueFrom:
