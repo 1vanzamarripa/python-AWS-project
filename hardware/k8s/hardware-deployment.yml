@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: hardware
-        image: <DOCKER_REPO>/hardware:latest
+        image: 1vanzamarripa/hardware:latest
         env:
         - name: DB_PASSWORD
           valueFrom:
@@ -35,13 +35,6 @@ spec:
         ports:
         - containerPort: 5001
           protocol: TCP
-        livenessProbe:
-          httpGet:
-            scheme: HTTPS
-            path: /hardware
-            port: 5001
-          initialDelaySeconds: 30
-          timeoutSeconds: 30
       serviceAccountName: kubernetes-dashboard
       tolerations:
       - key: node-role.kubernetes.io/master
