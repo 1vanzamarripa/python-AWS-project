@@ -57,7 +57,7 @@ cd hardware
 ```
 cd portal
 ./build.sh
-
+```
 The build scripts create a docker image containing the python dependencies needed for each app (therefore you will be prompted for your docker hub repo name and authentication), and then the images are pushed to your docker hub repo. Then, the k8s manifests are modified in such a way that enables them to pull the new image.
 
 The k8s objects that get created are: a deployment and a service for each app, and for portal a load balancer type of service gets creaed so the app can be accessed from the internet.
