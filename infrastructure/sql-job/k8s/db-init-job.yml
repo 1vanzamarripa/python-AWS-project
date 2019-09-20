@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sql-job
+  namespace: homework
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec: 
+      containers:
+      - name: sql-job
+        image: <DOCKER_REPO>/sql-job:<DOCKER_TAG>
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: hardware
+              key: dbpass
+        - name: DB_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: hardware
+              key: dbendpoint
+      restartPolicy: Never
