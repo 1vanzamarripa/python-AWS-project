@@ -7,9 +7,13 @@ metadata:
     k8s-app: portal
   name: portal
   namespace: homework
+  annotations:
+    kubernetes.io/ingress.class: alb
 spec:
   ports:
     - port: 5000
       targetPort: 5000
   selector:
     k8s-app: portal
+  type: LoadBalancer
+

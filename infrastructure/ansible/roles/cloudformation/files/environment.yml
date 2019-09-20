@@ -102,7 +102,9 @@ Resources:
       Tags:
         - Key: Name
           Value: Infrastructure Public Subnet (AZ1)
-
+        - Key: kubernetes.io/role/elb
+          Value: 1
+        
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
@@ -113,6 +115,8 @@ Resources:
       Tags:
         - Key: Name
           Value: Infrastructure Public Subnet (AZ2)
+        - Key: kubernetes.io/role/elb
+          Value: 1
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
@@ -124,6 +128,8 @@ Resources:
       Tags:
         - Key: Name
           Value: Infrastructure Private Subnet (AZ1)
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
 
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
@@ -135,6 +141,8 @@ Resources:
       Tags:
         - Key: Name
           Value: Infrastructure Private Subnet (AZ2)
+        - Key: kubernetes.io/role/internal-elb
+          Value: 1
 
   NatGateway1EIP:
     Type: AWS::EC2::EIP
@@ -231,33 +239,6 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
-#  JumpBoxSecurityGroup:
-#    Type: AWS::EC2::SecurityGroup
-#    Condition: CreateJumpBox
-#    Properties:
-#      GroupName: "jumpbox-security-group"
-#      GroupDescription: "Security group for the jumpbox"
-#      VpcId: !Ref VPC
-#      SecurityGroupIngress:
-#      - IpProtocol: tcp
-#        FromPort: 22
-#        ToPort: 22
-#        CidrIp: 0.0.0.0/0
-
-#  JumpBox:
-#    Type: AWS::EC2::Instance
-#    Condition: CreateJumpBox
-#    Properties:
-#      ImageId: !FindInMap [ RegionMap , !Ref 'AWS::Region', AMI ]
-#      SecurityGroupIds:
-#      - !Ref JumpBoxSecurityGroup
-#      SubnetId: !Ref PublicSubnet1
-#      InstanceType: t3.micro
-#      KeyName: !Ref KeyName
-#      Tags:
-#        - Key: Name
-#          Value: JumpBox
-
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -327,15 +308,6 @@ Resources:
       GroupName: "eks-cluster-security-group"
       GroupDescription: "Security group for the eks cluster"
       VpcId: !Ref VPC
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIp: !Ref VpcCIDR
-      - IpProtocol: tcp
-        FromPort: 1025
-        ToPort: 65535
-        CidrIp: !Ref VpcCIDR
 
   EKSCluster:
     Type: 'AWS::EKS::Cluster'
@@ -387,7 +359,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
     DependsOn: NodeSecurityGroup
     Properties:
-      Description: Allow node to communicate with each other
+      Description: Allow nodes to communicate with each other
       GroupId: !Ref NodeSecurityGroup
       SourceSecurityGroupId: !Ref NodeSecurityGroup
       IpProtocol: -1
@@ -475,7 +447,7 @@ Resources:
   NodeLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      AssociatePublicIpAddress: true
+      AssociatePublicIpAddress: false
       IamInstanceProfile: !Ref NodeInstanceProfile
       ImageId: ami-08739803f18dcc019
       InstanceType: t2.small
@@ -498,13 +470,3 @@ Resources:
                      --stack  ${AWS::StackName} \
                      --resource NodeGroup  \
                      --region ${AWS::Region}
-
-Outputs:
-
-  NodeInstanceRole:
-    Description: The node instance role
-    Value: !GetAtt NodeInstanceRole.Arn
-
-  NodeSecurityGroup:
-    Description: The security group for the node group
-    Value: !Ref NodeSecurityGroup

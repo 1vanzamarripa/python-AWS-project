@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sql-job
+  namespace: homework
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      containers:
+      - name: sql-job
+        image: <DOCKER_REPO>/sql-job:<DOCKER_TAG>
+      restartPolicy: Never

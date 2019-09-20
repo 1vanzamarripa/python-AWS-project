@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
-import sqlite3 as sql
+import os
+import psycopg2
 import time
 import random
 application = Flask(__name__)
@@ -12,9 +13,13 @@ def slow_process_to_calculate_availability(provider, name):
 
 @application.route('/hardware/')
 def hardware():
-    con = sql.connect('database.db')
-    c = con.cursor()
+    con_string = "host="+ os.environ['DB_ENDPOINT']  \
+    +" port=5432 dbname=hardwareavailability user=postgres" \
+    +" password="+ os.environ['DB_PASSWORD']
+    con = psycopg2.connect(con_string)
 
+    c = con.cursor()
+    c.execute('SELECT * from hardware')
     statuses = [
         {
             'provider': row[1],
@@ -24,7 +29,7 @@ def hardware():
                 row[2]
             ),
         }
-        for row in c.execute('SELECT * from hardware')
+        for row in c.fetchall()
     ]
 
     con.close()

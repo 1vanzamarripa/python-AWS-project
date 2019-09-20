@@ -10,6 +10,4 @@ RUN pip install -r requirements.txt
 
 ENTRYPOINT ["python"]
 
-CMD ["hardware.py"]
-
-EXPOSE 5001/tcp
+CMD ["db-init.py"]

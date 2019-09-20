@@ -16,26 +16,44 @@ aws cloudformation deploy \
   --parameter-overrides KeyName=${KEY_PAIR_NAME} DatabasePassword=${RDS_DB_PASS} \
   --capabilities CAPABILITY_IAM
 
-### RDS SETUP
-DB_PASSWORD=$(echo $RDS_DB_PASS | base64)
-rm -rf ../hardware/k8s/hardware-secret.yml
-git checkout -- ../hardware/k8s/hardware-secret.yml
-sed -i "s|<DB_PASSWORD>|$DB_PASSWORD|g" ../hardware/k8s/hardware-secret.yml
-DB_ENDPOINT=$(aws rds describe-db-instances \
-  --db-instance-identifier hardwareavailability \
-  --query 'DBInstances[*].[Endpoint]' \
-  | grep "Address" | awk '{print $2}' | sed s/\"//g  | base64 -w 0)
-sed -i "s|<DB_ENDPOINT>|$DB_ENDPOINT|g" ../hardware/k8s/hardware-secret.yml
-
 ### EKS SETUP
 #obtaining EKS cluster credentials and saving in ~/.kube/config
-rm -rf ~/.kube
-aws eks --region us-east-1 update-kubeconfig --name HomeworkCluster
+rm -rf ~/.kube && aws eks --region us-east-1 update-kubeconfig --name HomeworkCluster
 #making sure worker nodes can join the cluster
 #https://docs.aws.amazon.com/eks/latest/userguide/launch-workers.html
 rm -rf aws-auth-cm.yaml
 git checkout -- aws-auth-cm.yaml
-NODE_INSTANCE_ROLE=$(aws iam list-roles --query 'Roles[?contains(Arn, `NodeInstanceRole`) == `true`].[Arn]' | grep arn)
+NODE_INSTANCE_ROLE=$(aws iam list-roles --query 'Roles[?contains(Arn, `NodeInstanceRole`) == `true`].[Arn]' | grep "arn")
 sed -i "s|<NodeInstanceRoleArn>|$NODE_INSTANCE_ROLE|g" aws-auth-cm.yaml
 kubectl apply -f aws-auth-cm.yaml
+#waiting for nodes to join before applying namespace config
+sleep 30 && kubectl apply -f namespace.yml
 
+### RDS SETUP
+DB_PASSWORD=$(echo $RDS_DB_PASS | base64)
+DB_ENDPOINT=$(aws rds describe-db-instances \
+  --db-instance-identifier hardwareavailability \
+  --query 'DBInstances[*].[Endpoint]' \
+  | grep "Address" | awk '{print $2}' | sed s/\"//g  | base64 -w 0)
+rm -rf sql-job/k8s/db-secret.yml
+git checkout -- sql-job/k8s/db-secret.yml
+sed -i "s|<DB_PASSWORD>|$DB_PASSWORD|g" sql-job/k8s/db-secret.yml
+sed -i "s|<DB_ENDPOINT>|$DB_ENDPOINT|g" sql-job/k8s/db-secret.yml
+sql-job/build.sh 
+
+### ALB INGRESS CONTROLLER SETUP
+#create the policy
+#curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/iam-policy.json
+#ROLE_POLICY_ARN=$(aws iam create-policy \
+#  --policy-name ALBIngressControllerIAMPolicy \
+#  --policy-document file://iam-policy.json \
+#  | grep "arn" | awk '{print $2}' | sed s/\"//g | sed s/,//g)
+#NODE_INSTANCE_ROLE_NAME=$(echo $NODE_INSTANCE_ROLE | awk 'BEGIN { FS="/" } /1/ { print $2 }' | sed s/\"//g )
+#aws iam attach-role-policy --policy-arn $ROLE_POLICY_ARN --role-name $NODE_INSTANCE_ROLE_NAME
+#rm -rf iam-policy.json
+#create a service account, cluster role, and cluster role binding for the ALB Ingress Controller to use
+#kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/rbac-role.yaml
+#deploy the ALB Ingress Controller
+#kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/alb-ingress-controller.yaml
+#open the ALB Ingress Controller deployment manifest for editing with the following command
+#kubectl get deployment.apps/alb-ingress-controller -n kube-system -o json > alb-ingress-controller.json
