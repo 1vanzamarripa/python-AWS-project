@@ -27,7 +27,7 @@ cd infrastructure
 
 You will be prompted for your AWS credentials (Access key and Secret key), the keyPair to use for ssh access into the worker nodes, and the RDS database credentials that you wish to set up.
 The script also sets up your k8s credentials locally for kubectl.
-Finally it runs a script that creates and pushes a docker image that gets pulled by a k8s job. The purpose of the k8s job is to populate the DB with data needed for the app to work. For the job to access the DB, a k8s secret is created in the cluster with the DB password and the DB endpoint.
+Finally it runs a script that creates and pushes a docker image that gets pulled by a k8s job (you will be prompted for your docker hub repository and credentials). The purpose of the k8s job is to populate the DB with data needed for the app to work. For the job to access the DB, a k8s secret is created in the cluster with the DB password and the DB endpoint.
 
 To destroy the stack:
 
