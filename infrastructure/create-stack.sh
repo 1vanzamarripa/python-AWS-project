@@ -33,20 +33,3 @@ sleep 30 && kubectl apply -f namespace.yml
 #This script will create a k8s job that will initialize the RDS DB with data
 cd sql-job && ./build.sh $RDS_DB_PASS 
 cd -
-
-### ALB INGRESS CONTROLLER SETUP
-#create the policy
-#curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/iam-policy.json
-#ROLE_POLICY_ARN=$(aws iam create-policy \
-#  --policy-name ALBIngressControllerIAMPolicy \
-#  --policy-document file://iam-policy.json \
-#  | grep "arn" | awk '{print $2}' | sed s/\"//g | sed s/,//g)
-#NODE_INSTANCE_ROLE_NAME=$(echo $NODE_INSTANCE_ROLE | awk 'BEGIN { FS="/" } /1/ { print $2 }' | sed s/\"//g )
-#aws iam attach-role-policy --policy-arn $ROLE_POLICY_ARN --role-name $NODE_INSTANCE_ROLE_NAME
-#rm -rf iam-policy.json
-#create a service account, cluster role, and cluster role binding for the ALB Ingress Controller to use
-#kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/rbac-role.yaml
-#deploy the ALB Ingress Controller
-#kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.2/docs/examples/alb-ingress-controller.yaml
-#open the ALB Ingress Controller deployment manifest for editing with the following command
-#kubectl get deployment.apps/alb-ingress-controller -n kube-system -o json > alb-ingress-controller.json
