@@ -65,7 +65,7 @@ The k8s objects that get created are: a deployment and a service for each app, a
 
 In order to find out the ALB endpoint to hit, run this command:
 ```
-kubectl get svc -n homework 
+kubectl get svc -n homework portal
 ```
 
 NOTE: There are Jenkinsfiles included that could be used as a starting point to set up CICD pipelines for the apps.
